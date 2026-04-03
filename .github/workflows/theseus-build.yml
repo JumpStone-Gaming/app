@@ -54,13 +54,11 @@ jobs:
         run: cp packages/app-lib/.env.prod packages/app-lib/.env
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build Windows app
-        shell: pwsh
-        run: |
-          # Wir bauen hier IMMER mit der normalen tauri.conf.json, da wir tauri-release.conf gelöscht haben
-          pnpm --filter=@modrinth/app run tauri build --verbose --bundles "nsis,updater"
+        timeout-minutes: 120
+        run: pnpm app:build
         env:
           # Diese Secrets musst du in GitHub hinterlegen (siehe Anleitung unten)
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
