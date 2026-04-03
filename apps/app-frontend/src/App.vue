@@ -67,7 +67,7 @@ import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
-import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
+import { trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_version } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
@@ -224,6 +224,10 @@ const messages = defineMessages({
 		defaultMessage:
 			'Minecraft authentication servers may be down right now. Check your internet connection and try again later.',
 	},
+		jsgamingNav: {
+			id: 'app.nav.js-gaming',
+			defaultMessage: 'JS Gaming',
+		},
 })
 
 async function setupApp() {
@@ -231,7 +235,6 @@ async function setupApp() {
 		native_decorations,
 		theme,
 		locale,
-		telemetry,
 		collapsed_navigation,
 		advanced_rendering,
 		onboarded,
@@ -274,11 +277,7 @@ async function setupApp() {
 		isMaximized.value = await getCurrentWindow().isMaximized()
 	})
 
-	if (telemetry) {
-		initAnalytics()
-		if (dev) debugAnalytics()
-		trackEvent('Launched', { version, dev, onboarded })
-	}
+	trackEvent('Launched', { version, dev, onboarded })
 
 	if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
 
@@ -870,6 +869,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				:is-subpage="(route) => route.path.startsWith('/project') && !route.query.i"
 			>
 				<CompassIcon />
+			</NavButton>
+			<NavButton v-tooltip.right="formatMessage(messages.jsgamingNav)" to="/jsgaming">
+				<NotepadTextIcon />
 			</NavButton>
 			<NavButton v-tooltip.right="'Skins (Beta)'" to="/skins">
 				<ChangeSkinIcon />

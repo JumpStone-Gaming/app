@@ -46,6 +46,14 @@ export default new createRouter({
 			},
 		},
 		{
+			path: '/jsgaming',
+			name: 'JS Gaming',
+			component: Pages.JsGaming,
+			meta: {
+				breadcrumb: [{ name: 'JS Gaming' }],
+			},
+		},
+		{
 			path: '/skins',
 			name: 'Skins',
 			component: Pages.Skins,

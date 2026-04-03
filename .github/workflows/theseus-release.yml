@@ -1,7 +1,7 @@
-name: JS Gaming App release
+name: Modrinth App release
 on:
   workflow_run:
-    workflows: ['Modrinth App build'] # Muss exakt so heißen wie das 'name' Feld in deiner build.yml
+    workflows: ['Modrinth App build']
     types: [completed]
 
 jobs:
@@ -15,21 +15,22 @@ jobs:
       - name: 📥 Check out code
         uses: actions/checkout@v4
 
-      - name: 📥 Download Artifacts
+      - name: 📥 Download Build Artifacts
         uses: dawidd6/action-download-artifact@v3
         with:
-          workflow: theseus-build.yml # Name deiner Build-Datei
-          workflow_conclusion: success
+          workflow: theseus-build.yml
           run_id: ${{ github.event.workflow_run.id }}
-          name: App bundle (x86_64-pc-windows-msvc) # Der Name des Uploads aus der build.yml
+          name: App bundle (x86_64-pc-windows-msvc)
           path: windows-build
 
-      - name: 🛠️ Generate updates.json
+      - name: 🛠️ Generate latest.json (Tauri Updater)
         run: |
           VERSION_TAG="${{ github.event.workflow_run.head_branch }}"
           VERSION="${VERSION_TAG#v}"
-          # Wir extrahieren die Signatur aus der generierten .sig Datei
-          SIG=$(cat windows-build/release/bundle/nsis/JS Gaming App_${VERSION}_x64-setup.nsis.zip.sig)
+
+          # Signatur aus der generierten .sig Datei auslesen
+          # Hinweis: Der Dateiname muss exakt so sein, wie Tauri ihn im Build erstellt!
+          SIG=$(cat windows-build/*.zip.sig)
 
           jq -nc \
             --arg ver "$VERSION" \
@@ -52,11 +53,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSION_TAG="${{ github.event.workflow_run.head_branch }}"
-          VERSION="${VERSION_TAG#v}"
 
           gh release create "$VERSION_TAG" \
-            --title "JS Gaming App ${VERSION}" \
+            --title "JS Gaming App $VERSION_TAG" \
             --notes "Automatischer Release von JumpStone Gaming" \
             latest.json \
-            windows-build/release/bundle/nsis/*.exe \
-            windows-build/release/bundle/nsis/*.zip
+            windows-build/*.exe \
+            windows-build/*.zip

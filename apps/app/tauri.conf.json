@@ -94,11 +94,11 @@
 			"capabilities": ["core", "plugins"],
 			"csp": {
 				"default-src": "'self' customprotocol: asset:",
-				"connect-src": "ipc: http://ipc.localhost https://modrinth.com https://*.modrinth.com https://jumpstone4477.de https://*.jumpstone4477.de https://usbverkehrtherum.de https://*.usbverkehrtherum.de https://github.com https://*.githubusercontent.com https://*.posthog.com https://*.sentry.io https://api.mclo.gs http://textures.minecraft.net https://textures.minecraft.net 'self' data: blob:",
+				"connect-src": "ipc: http://ipc.localhost https://modrinth.com https://*.modrinth.com https://jumpstone4477.de https://*.jumpstone4477.de https://usbverkehrtherum.de https://*.usbverkehrtherum.de https://github.com https://*.githubusercontent.com https://api.mclo.gs http://textures.minecraft.net https://textures.minecraft.net 'self' data: blob:",
 				"font-src": ["https://cdn-raw.modrinth.com/fonts/", "https://jumpstone.de"],
 				"img-src": "https: 'unsafe-inline' 'self' asset: http://asset.localhost http://textures.minecraft.net blob: data:",
 				"style-src": "'unsafe-inline' 'self'",
-				"script-src": "https://*.posthog.com https://tally.so/widgets/embed.js 'self'",
+				"script-src": "https://tally.so/widgets/embed.js 'self'",
 				"frame-src": "https://www.youtube.com https://www.youtube-nocookie.com https://discord.com https://tally.so/popup/ 'self'",
 				"media-src": "https://*.githubusercontent.com https://jumpstone.de"
 			}
