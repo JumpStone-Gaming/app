@@ -8,13 +8,8 @@
 				{{ formatProjectType(project.project_type).toLowerCase() }}. You may choose one from our
 				list or provide a custom license. You may also provide a custom URL to your chosen license;
 				otherwise, the license text will be displayed. See our
-				<nuxt-link
-					to="/news/article/licensing-guide/"
-					target="_blank"
-					rel="noopener"
-					class="text-link"
-				>
-					licensing guide
+				<nuxt-link to="/legal/copyright" target="_blank" rel="noopener" class="text-link">
+					copyright policy
 				</nuxt-link>
 				for more information.
 			</p>

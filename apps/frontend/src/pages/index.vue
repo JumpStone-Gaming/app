@@ -428,9 +428,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="bg-[var(--landing-raw-bg)]">
-			<LatestNewsRow />
-		</div>
+		<div class="bg-[var(--landing-raw-bg)]"></div>
 	</div>
 </template>
 <script setup>
@@ -458,7 +456,6 @@ import { ref } from 'vue'
 
 import ATLauncherLogo from '~/assets/images/external/atlauncher.svg?component'
 import PrismLauncherLogo from '~/assets/images/external/prism.svg?component'
-import LatestNewsRow from '~/components/ui/news/LatestNewsRow.vue'
 import { homePageNotifs, homePageProjects, homePageSearch } from '~/generated/state.json'
 
 const formatRelativeTime = useRelativeTime()

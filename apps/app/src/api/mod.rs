@@ -8,7 +8,6 @@ pub mod jre;
 pub mod logs;
 pub mod metadata;
 pub mod minecraft_skins;
-pub mod mr_auth;
 pub mod pack;
 pub mod process;
 pub mod profile;
@@ -17,13 +16,9 @@ pub mod settings;
 pub mod tags;
 pub mod utils;
 
-pub mod ads;
 pub mod cache;
 pub mod files;
-pub mod friends;
 pub mod worlds;
-
-mod oauth_utils;
 
 pub type Result<T> = std::result::Result<T, TheseusSerializableError>;
 

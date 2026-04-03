@@ -24,7 +24,6 @@ import ATLauncher from '~/assets/images/external/atlauncher.svg?component'
 import CurseForge from '~/assets/images/external/curseforge.svg?component'
 import PrismIcon from '~/assets/images/external/prism.svg?component'
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
-import LatestNewsRow from '~/components/ui/news/LatestNewsRow.vue'
 import { homePageProjects } from '~/generated/state.json'
 
 interface LauncherPlatform {
@@ -1238,9 +1237,7 @@ useSeoMeta({
 				</IntlFormatted>
 			</p>
 		</div>
-		<div class="bg-[var(--landing-raw-bg)]">
-			<LatestNewsRow />
-		</div>
+		<div class="bg-[var(--landing-raw-bg)]"></div>
 	</div>
 </template>
 

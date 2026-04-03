@@ -79,14 +79,6 @@ const footerLinks: {
 		label: defineMessage({ id: 'layout.footer.about', defaultMessage: 'About' }),
 		links: [
 			{
-				href: '/news',
-				label: defineMessage({ id: 'layout.footer.about.news', defaultMessage: 'News' }),
-			},
-			{
-				href: '/news/changelog',
-				label: defineMessage({ id: 'layout.footer.about.changelog', defaultMessage: 'Changelog' }),
-			},
-			{
 				href: 'https://status.modrinth.com',
 				label: defineMessage({ id: 'layout.footer.about.status', defaultMessage: 'Status' }),
 			},

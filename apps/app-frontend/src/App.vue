@@ -1,19 +1,14 @@
 <script setup>
-import { AuthFeature, PanelVersionFeature, TauriModrinthClient } from '@modrinth/api-client'
+import { PanelVersionFeature, TauriModrinthClient } from '@modrinth/api-client'
 import {
-	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
 	CompassIcon,
 	DownloadIcon,
-	ExternalIcon,
 	HomeIcon,
 	LeftArrowIcon,
 	LibraryIcon,
-	LogInIcon,
-	LogOutIcon,
 	MaximizeIcon,
 	MinimizeIcon,
-	NewspaperIcon,
 	NotepadTextIcon,
 	PlusIcon,
 	RefreshCwIcon,
@@ -21,13 +16,11 @@ import {
 	RightArrowIcon,
 	ServerIcon,
 	SettingsIcon,
-	UserIcon,
 	WorldIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	Admonition,
-	Avatar,
 	Button,
 	ButtonStyled,
 	commonMessages,
@@ -35,9 +28,7 @@ import {
 	CreationFlowModal,
 	defineMessages,
 	I18nDebugPanel,
-	NewsArticleCard,
 	NotificationPanel,
-	OverflowMenu,
 	PopupNotificationPanel,
 	ProgressSpinner,
 	provideModalBehavior,
@@ -53,11 +44,10 @@ import { useQuery } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { $fetch } from 'ofetch'
-import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, provide, ref } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
@@ -65,27 +55,22 @@ import ModrinthLoadingIndicator from '@/components/LoadingIndicatorBar.vue'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
-import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
-import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
 import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
-import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
-import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
-import { get_user, get_version } from '@/helpers/cache.js'
+import { get_version } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
-import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { create_profile_and_install_from_file } from '@/helpers/pack'
 import { list } from '@/helpers/profile.js'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
@@ -106,7 +91,6 @@ import {
 } from '@/providers/download-progress.ts'
 import { createServerInstall, provideServerInstall } from '@/providers/server-install'
 import { setupProviders } from '@/providers/setup'
-import { setupAuthProvider } from '@/providers/setup/auth'
 import { useError } from '@/store/error.js'
 import { useLoading, useTheming } from '@/store/state'
 
@@ -127,12 +111,7 @@ const { addPopupNotification } = popupNotificationManager
 
 const tauriApiClient = new TauriModrinthClient({
 	userAgent: `modrinth/theseus/${getVersion()} (support@modrinth.com)`,
-	features: [
-		new AuthFeature({
-			token: async () => (await getCreds()).session,
-		}),
-		new PanelVersionFeature(),
-	],
+	features: [new PanelVersionFeature()],
 })
 provideModrinthClient(tauriApiClient)
 providePageContext({
@@ -141,8 +120,6 @@ providePageContext({
 })
 provideModalBehavior({
 	noblur: computed(() => !themeStore.advancedRendering),
-	onShow: () => hide_ads_window(),
-	onHide: () => show_ads_window(),
 })
 
 const {
@@ -157,7 +134,6 @@ const {
 	handleModpackDuplicateGoToInstance,
 } = setupProviders(notificationManager)
 
-const news = ref([])
 const availableSurvey = ref(false)
 
 const offline = ref(!navigator.onLine)
@@ -320,8 +296,6 @@ async function setupApp() {
 			type: 'warn',
 		}),
 	)
-
-	fetch(`https://api.modrinth.com/appCriticalAnnouncement.json?version=${version}`)
 		.then((response) => response.json())
 		.then((res) => {
 			if (res && res.header && res.body) {
@@ -334,24 +308,7 @@ async function setupApp() {
 			)
 		})
 
-	fetch(`https://modrinth.com/news/feed/articles.json`)
-		.then((response) => response.json())
-		.then((res) => {
-			if (res && res.articles) {
-				news.value = res.articles
-					.map((article) => ({
-						...article,
-						path: article.link,
-					}))
-					.slice(0, 4)
-			}
-		})
-		.catch((error) => {
-			console.error('Failed to fetch news articles', error)
-		})
-
 	get_opening_command().then(handleCommand)
-	fetchCredentials()
 
 	try {
 		const skins = (await get_available_skins()) ?? []
@@ -451,56 +408,6 @@ const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
 const updateToPlayModal = ref()
 
-const credentials = ref()
-
-const modrinthLoginFlowWaitModal = ref()
-
-setupAuthProvider(credentials, async (_redirectPath) => {
-	await signIn()
-})
-
-async function fetchCredentials() {
-	const creds = await getCreds().catch(handleError)
-	if (creds && creds.user_id) {
-		creds.user = await get_user(creds.user_id, 'bypass').catch(handleError)
-	}
-	credentials.value = creds ?? null
-}
-
-async function signIn() {
-	modrinthLoginFlowWaitModal.value.show()
-
-	try {
-		await login()
-		await fetchCredentials()
-	} catch (error) {
-		if (
-			typeof error === 'object' &&
-			typeof error['message'] === 'string' &&
-			error.message.includes('Login canceled')
-		) {
-			// Not really an error due to being a result of user interaction, show nothing
-		} else {
-			handleError(error)
-		}
-	} finally {
-		modrinthLoginFlowWaitModal.value.hide()
-	}
-}
-
-async function logOut() {
-	await logout().catch(handleError)
-	await fetchCredentials()
-}
-
-const MIDAS_BITFLAG = 1 << 0
-const hasPlus = computed(
-	() =>
-		credentials.value &&
-		credentials.value.user &&
-		(credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG,
-)
-
 const sidebarToggled = ref(true)
 
 themeStore.$subscribe(() => {
@@ -511,18 +418,6 @@ const forceSidebar = computed(
 	() => route.path.startsWith('/browse') || route.path.startsWith('/project'),
 )
 const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
-const showAd = computed(
-	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
-)
-
-watch(showAd, () => {
-	if (!showAd.value) {
-		hide_ads_window(true)
-	} else {
-		init_ads_window(true)
-	}
-})
-
 onMounted(() => {
 	invoke('show_window')
 
@@ -623,10 +518,6 @@ const updatePopupMessages = defineMessages({
 		id: 'app.update-popup.download',
 		defaultMessage: 'Download ({size})',
 	},
-	changelog: {
-		id: 'app.update-popup.changelog',
-		defaultMessage: 'Changelog',
-	},
 })
 
 async function checkUpdates() {
@@ -680,10 +571,6 @@ async function checkUpdates() {
 							}),
 							action: () => downloadAvailableUpdate(),
 							color: 'brand',
-						},
-						{
-							label: formatMessage(updatePopupMessages.changelog),
-							action: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
 						},
 					],
 				})
@@ -763,10 +650,6 @@ async function downloadUpdate(versionToDownload) {
 						action: () => installUpdate(),
 						color: 'brand',
 					},
-					{
-						label: formatMessage(updatePopupMessages.changelog),
-						action: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
-					},
 				],
 			})
 		})
@@ -843,8 +726,7 @@ async function openSurvey() {
 		return
 	}
 
-	const creds = await getCreds().catch(handleError)
-	const userId = creds?.user_id
+	const userId = undefined
 
 	const formId = availableSurvey.value.tally_id
 
@@ -859,24 +741,20 @@ async function openSurvey() {
 		onOpen: () => console.info('Opened user survey'),
 		onClose: () => {
 			console.info('Closed user survey')
-			show_ads_window()
 		},
 		onSubmit: () => console.info('Active user survey submitted'),
 	}
 
 	try {
-		hide_ads_window()
 		if (window.Tally?.openPopup) {
 			console.info(`Opening Tally popup for user survey (form ID: ${formId})`)
 			dismissSurvey()
 			window.Tally.openPopup(formId, popupOptions)
 		} else {
 			console.warn('Tally script not yet loaded')
-			show_ads_window()
 		}
 	} catch (e) {
 		console.error('Error opening Tally popup:', e)
-		show_ads_window()
 	}
 
 	console.info(`Found user survey to show with tally_id: ${formId}`)
@@ -897,8 +775,7 @@ async function processPendingSurveys() {
 
 	cleanupOldSurveyDisplayData()
 
-	const creds = await getCreds().catch(handleError)
-	const userId = creds?.user_id
+	const userId = undefined
 
 	const instances = await list().catch(handleError)
 	const isActivePlayer =
@@ -959,9 +836,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		</Transition>
 		<Suspense>
 			<AppSettingsModal ref="settingsModal" />
-		</Suspense>
-		<Suspense>
-			<AuthGrantFlowWaitModal ref="modrinthLoginFlowWaitModal" @flow-cancel="cancelLogin" />
 		</Suspense>
 		<CreationFlowModal
 			ref="installationModal"
@@ -1056,40 +930,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				:to="() => $refs.settingsModal.show()"
 			>
 				<SettingsIcon />
-			</NavButton>
-			<OverflowMenu
-				v-if="credentials?.user"
-				v-tooltip.right="`Modrinth account`"
-				class="w-12 h-12 text-primary rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast border-0 cursor-pointer"
-				:options="[
-					{
-						id: 'view-profile',
-						action: () => openUrl('https://modrinth.com/user/' + credentials.user.username),
-					},
-					{
-						id: 'sign-out',
-						action: () => logOut(),
-						color: 'danger',
-					},
-				]"
-				placement="right-end"
-			>
-				<Avatar :src="credentials?.user?.avatar_url" alt="" size="32px" circle />
-				<template #view-profile>
-					<UserIcon />
-					<span class="inline-flex items-center gap-1">
-						Signed in as
-						<span class="inline-flex items-center gap-1 text-contrast font-semibold">
-							<Avatar :src="credentials?.user?.avatar_url" alt="" size="20px" circle />
-							{{ credentials?.user?.username }}
-						</span>
-					</span>
-					<ExternalIcon />
-				</template>
-				<template #sign-out> <LogOutIcon /> Sign out </template>
-			</OverflowMenu>
-			<NavButton v-else v-tooltip.right="'Sign in to a Modrinth account'" :to="() => signIn()">
-				<LogInIcon class="text-brand" />
 			</NavButton>
 		</div>
 		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
@@ -1232,12 +1072,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		</div>
 		<div
 			class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid overflow-auto"
-			:class="{ 'has-plus': hasPlus }"
 		>
-			<div
-				class="app-sidebar-scrollable flex-grow shrink overflow-y-auto relative"
-				:class="{ 'pb-12': !hasPlus }"
-			>
+			<div class="app-sidebar-scrollable flex-grow shrink overflow-y-auto relative pb-12">
 				<div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
 				<div class="sidebar-default-content" :class="{ 'sidebar-enabled': sidebarVisible }">
 					<div
@@ -1248,42 +1084,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 							<AccountsCard ref="accounts" mode="small" />
 						</suspense>
 					</div>
-					<div class="py-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
-						<suspense>
-							<FriendsList
-								:credentials="credentials"
-								:sign-in="() => signIn()"
-								:refresh-credentials="fetchCredentials"
-							/>
-						</suspense>
-					</div>
-					<div v-if="news && news.length > 0" class="p-4 pr-1 flex flex-col items-center">
-						<h3 class="text-base mb-4 text-primary font-medium m-0 text-left w-full">News</h3>
-						<div class="space-y-4 flex flex-col items-center w-full">
-							<NewsArticleCard
-								v-for="(item, index) in news"
-								:key="`news-${index}`"
-								:article="item"
-							/>
-							<ButtonStyled color="brand" size="large">
-								<a href="https://modrinth.com/news" target="_blank" class="my-4">
-									<NewspaperIcon /> View all news
-								</a>
-							</ButtonStyled>
-						</div>
-					</div>
 				</div>
 			</div>
-			<template v-if="showAd">
-				<a
-					href="https://modrinth.plus?app"
-					class="absolute bottom-[250px] w-full flex justify-center items-center gap-1 px-4 py-3 text-purple font-medium hover:underline z-10"
-					target="_blank"
-				>
-					<ArrowBigUpDashIcon class="text-2xl" /> Upgrade to Modrinth+
-				</a>
-				<PromotionWrapper />
-			</template>
 		</div>
 	</div>
 	<I18nDebugPanel />

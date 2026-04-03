@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BookTextIcon, XIcon } from '@modrinth/assets'
+import { XIcon } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, PagewideBanner, useVIntl } from '@modrinth/ui'
 
 const flags = useFeatureFlags()
@@ -38,22 +38,6 @@ function hideRussiaCensorshipBanner() {
 			<p class="-mt-2 mb-0 text-sm opacity-50" lang="en">
 				Please seek a reputable VPN or proxy of some kind to continue to access Modrinth in Russia.
 			</p>
-		</template>
-		<template #actions>
-			<div class="mt-2 flex w-fit gap-2">
-				<ButtonStyled color="brand">
-					<nuxt-link to="/news/article/standing-by-our-values-russian">
-						<BookTextIcon /> Прочесть наше полное заявление
-						<span class="text-xs font-medium">(Перевод на русский)</span>
-					</nuxt-link>
-				</ButtonStyled>
-				<ButtonStyled>
-					<nuxt-link to="/news/article/standing-by-our-values">
-						<BookTextIcon /> Read our full statement
-						<span class="text-xs font-medium">(English)</span>
-					</nuxt-link>
-				</ButtonStyled>
-			</div>
 		</template>
 		<template #actions_right>
 			<ButtonStyled circular type="transparent">

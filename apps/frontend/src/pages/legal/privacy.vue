@@ -120,13 +120,7 @@
 		<p>This data is used to deliver statistics.</p>
 
 		<h3>Creator Monetization Program data</h3>
-		<p>
-			When you sign up for our
-			<nuxt-link to="/news/article/creator-monetization-beta">
-				Creator Monetization Program</nuxt-link
-			>
-			(the "CMP"), we collect:
-		</p>
+		<p>When you sign up for our Creator Monetization Program (the "CMP"), we collect:</p>
 		<ul>
 			<li>Your PayPal email address (if applicable)</li>
 			<li>Your Venmo username (if applicable)</li>

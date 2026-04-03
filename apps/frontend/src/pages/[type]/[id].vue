@@ -843,13 +843,6 @@
 									: messages.environmentMigrationNoPermissionMessage,
 							)
 						}}
-						<nuxt-link
-							to="/news/article/new-environments"
-							target="_blank"
-							class="mt-1 block w-fit font-semibold text-orange hover:underline"
-						>
-							{{ formatMessage(messages.environmentMigrationLink) }}
-						</nuxt-link>
 						<ButtonStyled v-if="hasEditDetailsPermission" color="orange">
 							<button class="mt-3 w-fit" @click="() => projectEnvironmentModal.show()">
 								<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}

@@ -93,7 +93,3 @@ export async function command_listener(callback) {
 export async function warning_listener(callback) {
 	return await listen('warning', (event) => callback(event.payload))
 }
-
-export async function friend_listener(callback) {
-	return await listen('friend', (event) => callback(event.payload))
-}
