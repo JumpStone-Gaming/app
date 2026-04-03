@@ -57,6 +57,10 @@ jobs:
         # --no-frozen-lockfile ist hier die Rettung für Portabilitätsfehler
         run: pnpm install --no-frozen-lockfile
 
+      - name: Prepare app-lib environment
+        shell: pwsh
+        run: Copy-Item packages/app-lib/.env.prod packages/app-lib/.env -Force
+
       - name: Build Windows app
         timeout-minutes: 60
         run: pnpm app:build
