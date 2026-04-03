@@ -22,26 +22,26 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          submodules: false # WICHTIG: Verhindert Abbrüche durch fremde Submodule
+          fetch-depth: 1 # Nur den aktuellsten Stand laden (spart Zeit & Fehler)
+          submodules: false # Submodule komplett ignorieren
+          persist-credentials: false # Verhindert Rechte-Konflikte beim Checkout
 
-      - name: Cleanup Windows Runner
-        # Dieser Schritt beendet blockierende Prozesse, BEVOR Tools installiert werden
+      - name: Force Kill Build Processes
+        # Wir killen alles, was den Checkout oder pnpm blockieren könnte
         run: |
-          Get-Process vctip -ErrorAction SilentlyContinue | Stop-Process -Force
-          Get-Process msbuild -ErrorAction SilentlyContinue | Stop-Process -Force
+          Get-Process vctip, msbuild, git -ErrorAction SilentlyContinue | Stop-Process -Force
         shell: pwsh
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24 # Upgrade auf die neueste stabile Version
-          # Wir lassen den Cache erst mal weg, um Fehler durch alte Caches zu vermeiden
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          # Cache erst mal weglassen, um "Gift" im Build auszuschließen
 
       - name: Setup Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -52,21 +52,22 @@ jobs:
           APP_VERSION="${GITHUB_REF_NAME#v}"
           [ "$APP_VERSION" == "main" ] && APP_VERSION="0.1.0-dev"
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
-          # Patcht die Version in die package.json
+          # Patcht die Version
           sed -i "s/\"version\": \".*\"/\"version\": \"$APP_VERSION\"/" apps/app-frontend/package.json
 
       - name: Install dependencies
-        # Wir nutzen --no-frozen-lockfile, damit pnpm kleine Abweichungen selbst heilt
+        # --no-frozen-lockfile ist hier die Rettung für Portabilitätsfehler
         run: pnpm install --no-frozen-lockfile
 
       - name: Build Windows app
-        timeout-minutes: 120
+        timeout-minutes: 60
         run: pnpm app:build
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
       - name: Upload app bundles
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: App bundle (${{ matrix.artifact-target-name }})
