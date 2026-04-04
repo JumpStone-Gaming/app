@@ -4,6 +4,9 @@ on:
     workflows: ['Modrinth App build']
     types: [completed]
 
+permissions:
+  contents: write
+
 jobs:
   release:
     name: Release JS Gaming App
@@ -28,35 +31,55 @@ jobs:
           VERSION_TAG="${{ github.event.workflow_run.head_branch }}"
           VERSION="${VERSION_TAG#v}"
 
-          # Signatur aus der generierten .sig Datei auslesen
-          # Hinweis: Der Dateiname muss exakt so sein, wie Tauri ihn im Build erstellt!
-          SIG=$(cat windows-build/*.zip.sig)
+          SIG_FILE="$(find windows-build -type f -name '*.zip.sig' -print -quit)"
+          ZIP_FILE=""
+          if [ -n "$SIG_FILE" ]; then
+            ZIP_FILE="${SIG_FILE%.sig}"
+          fi
 
-          jq -nc \
-            --arg ver "$VERSION" \
-            --arg sig "$SIG" \
-            --arg url "https://github.com/${{ github.repository }}/releases/download/$VERSION_TAG/JS_Gaming_App_${VERSION}_x64-setup.nsis.zip" \
-            '{
-              "version": $ver,
-              "notes": "JumpStone Launcher Update",
-              "pub_date": now | todateiso8601,
-              "platforms": {
-                "windows-x86_64": {
-                  "signature": $sig,
-                  "url": $url
+          if [ -n "$SIG_FILE" ] && [ -f "$ZIP_FILE" ]; then
+            SIG="$(cat "$SIG_FILE")"
+            ZIP_NAME="$(basename "$ZIP_FILE")"
+
+            jq -nc \
+              --arg ver "$VERSION" \
+              --arg sig "$SIG" \
+              --arg url "https://github.com/${{ github.repository }}/releases/download/$VERSION_TAG/$ZIP_NAME" \
+              '{
+                "version": $ver,
+                "notes": "JumpStone Launcher Update",
+                "pub_date": now | todateiso8601,
+                "platforms": {
+                  "windows-x86_64": {
+                    "signature": $sig,
+                    "url": $url
+                  }
                 }
-              }
-            }' > latest.json
+              }' > latest.json
+
+            echo "HAS_UPDATER=true" >> "$GITHUB_ENV"
+          else
+            echo "Kein Updater-Archiv (.zip + .zip.sig) gefunden. latest.json wird uebersprungen."
+            echo "HAS_UPDATER=false" >> "$GITHUB_ENV"
+          fi
 
       - name: 🏷️ Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSION_TAG="${{ github.event.workflow_run.head_branch }}"
+          mapfile -d '' ASSETS < <(find windows-build -type f \( -name '*.exe' -o -name '*.msi' -o -name '*.zip' \) -print0)
+
+          if [ "${HAS_UPDATER}" = "true" ] && [ -f latest.json ]; then
+            ASSETS+=("latest.json")
+          fi
+
+          if [ "${#ASSETS[@]}" -eq 0 ]; then
+            echo "Keine Release-Assets in windows-build gefunden."
+            exit 1
+          fi
 
           gh release create "$VERSION_TAG" \
             --title "JS Gaming App $VERSION_TAG" \
             --notes "Automatischer Release von JumpStone Gaming" \
-            latest.json \
-            windows-build/*.exe \
-            windows-build/*.zip
+            "${ASSETS[@]}"
