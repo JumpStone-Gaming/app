@@ -74,6 +74,7 @@ jobs:
         with:
           name: App bundle (${{ matrix.artifact-target-name }})
           path: |
-            apps/app/src-tauri/target/release/bundle/nsis/*.exe
-            apps/app/src-tauri/target/release/bundle/nsis/*.zip
-            apps/app/src-tauri/target/release/bundle/nsis/*.sig
+            target/release/bundle/nsis/*.exe
+            target/release/bundle/nsis/*.zip
+            target/release/bundle/nsis/*.sig
+            target/release/bundle/msi/*.msi
