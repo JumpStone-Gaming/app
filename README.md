@@ -1,38 +1,32 @@
-# ![Modrinth Monorepo Cover](/.github/assets/monorepo_cover.png)
+# JSGaming App
 
-![Issues](https://img.shields.io/github/issues-raw/Modrinth/code?color=c78aff&label=issues&style=for-the-badge)
-![Pull Requests](https://img.shields.io/github/issues-pr-raw/Modrinth/code?color=c78aff&label=PRs&style=for-the-badge)
-![Contributors](https://img.shields.io/github/contributors/Modrinth/code?color=c78aff&label=contributors&style=for-the-badge)
-![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/modrinth/code/badge?style=flat&logoColor=white&color=c78aff&style=for-the-badge)
-![Commit Activity](https://img.shields.io/github/commit-activity/m/Modrinth/code?color=c78aff&label=commits&style=for-the-badge)
-![Last Commit](https://img.shields.io/github/last-commit/Modrinth/code?color=c78aff&label=last%20commit&style=for-the-badge)
+![Issues](https://img.shields.io/github/issues-raw/JumpStone-Gaming/launcher?color=c78aff&label=issues&style=for-the-badge)
+![Pull Requests](https://img.shields.io/github/issues-pr-raw/JumpStone-Gaming/launcher?color=c78aff&label=PRs&style=for-the-badge)
+![Contributors](https://img.shields.io/github/contributors/JumpStone-Gaming/launcher?color=c78aff&label=contributors&style=for-the-badge)
+![Commit Activity](https://img.shields.io/github/commit-activity/m/JumpStone-Gaming/launcher?color=c78aff&label=commits&style=for-the-badge)
+![Last Commit](https://img.shields.io/github/last-commit/JumpStone-Gaming/launcher?color=c78aff&label=last%20commit&style=for-the-badge)
 
-## Modrinth Monorepo
+Welcome to the JSGaming App repository. It was forked from `modrinth/code` and still contains a bunch of parts of Modrinth's monorepo. But the JSGamign App mainly uses the `app` directories (for example `apps/app`, `apps/app-frontend`).
 
-Welcome to the Modrinth Monorepo, the primary codebase for the Modrinth web interface and app. It contains ![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/modrinth/olympus/badge?logoColor=white&color=black&label=) lines of code and has ![Contributors](https://img.shields.io/github/contributors/Modrinth/code?color=black&label=) contributors!
+This Repo contains ![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/JumpStone-Gaming/launcher/badge?logoColor=white&color=black&label=) lines of code.
 
-If you're not a developer and you've stumbled upon this repository, you can access the web interface on the [Modrinth website](https://modrinth.com) and download the latest release of the app [here](https://modrinth.com/app).
+## Monorepo
 
-## Development
-
-This repository contains two primary packages. For detailed development information, please refer to their respective READMEs:
-
-- [Web Interface](apps/frontend/README.md)
-- [Desktop App](apps/app/README.md)
+As mentioned earlier, this repository is a fork of `modrinth/code`. As this is, or rather was, a monorepo, my repository still contains vast amounts of stuff that are unnecessary for the JSGaming app. I plan to remove these unnecessary packages in the future.
 
 ## Contributing
 
-We welcome contributions! Before submitting any contributions, please read our [contributing guidelines](https://docs.modrinth.com/contributing/getting-started/).
+I welcome contributions! Before submitting any contributions, please read my [contributing guidelines](CONTRIBUTING.md).
 
-If you plan to fork this repository for your own purposes, please review our [copying guidelines](COPYING.md).
+If you plan to fork this repository for your own purposes, please review my [copying guidelines](COPYING.md).
 
 ## Security
 
-If you discover a security vulnerability within our codebase, please follow our [responsible disclosure guidelines](https://modrinth.com/legal/security).
+If you discover a security vulnerability in my code, please contact me. If you want to gelp modrinth (the upstream repository), you can follow modrinth’s [responsible disclosure policy](https://modrinth.com/legal/security).
 
 ## Support
 
-If you need help with the Modrinth web interface or app, please visit our [support page](https://support.modrinth.com). For general inquiries, you can also join our [Discord server](https://discord.modrinth.com).
+If you need help with the JSGaming App, please join my [Discord server](https://discord.gg/MNf6BtTgUq).
 
 ## License
 
