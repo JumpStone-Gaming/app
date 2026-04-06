@@ -15,8 +15,33 @@ jobs:
     steps:
       - name: 📥 Check out code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: 🔖 Resolve release tag
+        id: resolve_tag
+        run: |
+          VERSION_TAG=""
+          while IFS= read -r tag; do
+            if [[ "$tag" == v* ]]; then
+              VERSION_TAG="$tag"
+              break
+            fi
+          done < <(git tag --points-at HEAD)
+
+          if [ -z "$VERSION_TAG" ]; then
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "ℹ️ Kein Release-Tag für diesen Commit gefunden. Release wird übersprungen."
+            exit 0
+          fi
+
+          echo "version_tag=$VERSION_TAG" >> "$GITHUB_OUTPUT"
+          echo "found=true" >> "$GITHUB_OUTPUT"
 
       - name: 📥 Download Build Artifacts
+        if: steps.resolve_tag.outputs.found == 'true'
         uses: dawidd6/action-download-artifact@v3
         with:
           workflow: theseus-build.yml
@@ -25,15 +50,10 @@ jobs:
           path: windows-build
 
       - name: 🛠️ Generate latest.json (Tauri Updater)
+        if: steps.resolve_tag.outputs.found == 'true'
+        env:
+          VERSION_TAG: ${{ steps.resolve_tag.outputs.version_tag }}
         run: |
-          # Extrahiere den Tag-Namen aus dem Git-Repository
-          VERSION_TAG=$(git describe --tags --exact-match 2>/dev/null || echo "")
-
-          if [ -z "$VERSION_TAG" ]; then
-            echo "❌ Kein git tag für diesen Commit gefunden. Release wird abgebrochen."
-            exit 1
-          fi
-
           VERSION="${VERSION_TAG#v}"
           echo "📦 Version: $VERSION (Tag: $VERSION_TAG)"
 
@@ -75,14 +95,12 @@ jobs:
           echo "✅ latest.json erstellt:"
           cat latest.json
 
-          echo "VERSION_TAG=$VERSION_TAG" >> "$GITHUB_ENV"
-
       - name: 🏷️ Create GitHub Release
+        if: steps.resolve_tag.outputs.found == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          VERSION_TAG: ${{ steps.resolve_tag.outputs.version_tag }}
         run: |
-          VERSION_TAG="${{ env.VERSION_TAG }}"
-
           if [ -z "$VERSION_TAG" ]; then
             echo "❌ VERSION_TAG nicht gesetzt!"
             exit 1
